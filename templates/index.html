@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Student PDF Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main>
+    <p class="kicker">Academic records</p>
+    <h1>Student PDF Generator</h1>
+    <p class="intro">Create your personalized report cover and attach it to the fixed report in one download.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+    <form action="{{ url_for('generate') }}" method="post" id="student-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="student_name">Student Name</label>
+        <input id="student_name" name="student_name" type="text" maxlength="100" required autocomplete="name" value="{{ student_name }}">
+        <label for="register_number">Register Number</label>
+        <input id="register_number" name="register_number" type="text" maxlength="50" required autocomplete="off" value="{{ register_number }}">
+        <button type="submit">Generate PDF</button>
+    </form>
+</main>
+<script>
+document.getElementById('student-form').addEventListener('submit', function (event) {
+    const name = document.getElementById('student_name');
+    const registerNumber = document.getElementById('register_number');
+    name.value = name.value.trim();
+    registerNumber.value = registerNumber.value.trim();
+    if (!name.value || name.value.length > 100 || !registerNumber.value || registerNumber.value.length > 50) {
+        event.preventDefault();
+        this.reportValidity();
+    }
+});
+</script>
+</body>
+</html>
