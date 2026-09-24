@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import secrets
+import threading
 from pathlib import Path
 
 from flask import Flask, abort, flash, redirect, render_template, request, send_from_directory, session, url_for
@@ -18,6 +19,23 @@ def create_app() -> Flask:
     config.LOGS_DIR.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(filename=config.LOGS_DIR / "error.log", level=logging.ERROR, format="%(asctime)s %(levelname)s %(message)s")
     generator = PdfGenerator(config)
+
+    def schedule_output_deletion(path: Path) -> None:
+        try:
+            created_at = path.stat().st_mtime_ns
+        except OSError:
+            return
+
+        def delete_if_unchanged() -> None:
+            try:
+                if path.is_file() and path.stat().st_mtime_ns == created_at:
+                    path.unlink()
+            except OSError:
+                logging.getLogger(__name__).warning("Could not remove temporary generated file: %s", path.name)
+
+        timer = threading.Timer(config.OUTPUT_DELETE_AFTER_SECONDS, delete_if_unchanged)
+        timer.daemon = True
+        timer.start()
 
     @app.after_request
     def security_headers(response):
@@ -56,6 +74,7 @@ def create_app() -> Flask:
             logging.getLogger(__name__).exception("PDF generation failed")
             flash(str(error), "alert")
             return render_template("index.html", csrf_token=stored_token, student_name=student_name, register_number=register_number), 500
+        schedule_output_deletion(generated)
         return redirect(url_for("download", filename=generated.name))
 
     @app.get("/download/<path:filename>")
