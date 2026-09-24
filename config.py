@@ -14,6 +14,7 @@ SECRET_KEY = os.environ.get("STUDENT_PDF_SECRET_KEY") or secrets.token_hex(32)
 MAX_NAME_LENGTH = 100
 MAX_REGISTER_LENGTH = 50
 OUTPUT_MAX_AGE_SECONDS = 60 * 60
+OUTPUT_DELETE_AFTER_SECONDS = 10
 
 # Coordinates are ReportLab points, measured from the bottom-left of page one.
 # The x coordinate is the horizontal center because both fields are centered.
