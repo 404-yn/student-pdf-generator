@@ -21,7 +21,7 @@ OUTPUT_DELETE_AFTER_SECONDS = 10
 OVERLAY = {
     "student_name": {
         "x": 297.64,
-        "y": 657.0,
+        "y": 687.0,
         "font_size": 16,
         "font_name": "Times-Bold",
         "mask_width": 220.0,
@@ -30,7 +30,7 @@ OVERLAY = {
     },
     "register_number": {
         "x": 297.64,
-        "y": 634.0,
+        "y": 664.0,
         "font_size": 15,
         "font_name": "Times-Bold",
         "mask_width": 250.0,
